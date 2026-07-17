@@ -49,11 +49,11 @@ Audit Logs
 
 **Developed By**
 
-**Aryan Kushwaha
+Aryan Kushwaha
 
 Organization: HCL Technologies
 
 Project Manager: Sunil Kumar (51370013)
 
-Technical Mentor: Ram Krishan Sharma (52340251)**
+Technical Mentor: Ram Krishan Sharma (52340251)
 
