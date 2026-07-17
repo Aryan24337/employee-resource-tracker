@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Employee</title>
+
+    <style>
+
+        body{
+            font-family:Arial,sans-serif;
+            background:#f4f6f9;
+            margin:0;
+        }
+
+        .header{
+            background:#0f4c81;
+            color:white;
+            padding:20px;
+            text-align:center;
+        }
+
+        .container{
+            width:60%;
+            margin:30px auto;
+            background:white;
+            padding:30px;
+            border-radius:10px;
+            box-shadow:0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        input, select{
+            width:100%;
+            padding:10px;
+            margin-top:5px;
+            margin-bottom:15px;
+            border:1px solid #ccc;
+            border-radius:5px;
+            box-sizing:border-box;
+        }
+
+        label{
+            font-weight:bold;
+        }
+
+        .btn{
+            background:#0f4c81;
+            color:white;
+            border:none;
+            padding:12px 25px;
+            border-radius:5px;
+            cursor:pointer;
+        }
+
+        .back-btn{
+            display:inline-block;
+            margin-bottom:20px;
+            color:#0f4c81;
+            text-decoration:none;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="header">
+    <h1>Add Employee</h1>
+</div>
+
+<div class="container">
+
+    <a href="/dashboard/" class="back-btn">
+        ← Dashboard
+    </a>
+
+{% if error %}
+
+<div style="
+    background:#f8d7da;
+    color:#721c24;
+    padding:12px;
+    margin-bottom:20px;
+    border-radius:5px;
+">
+
+    {{ error }}
+
+</div>
+
+{% endif %}
+
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+        <label>Employee ID</label>
+
+        <input type="text"
+               name="emp_id"
+               maxlength="8"
+               pattern="[0-9]{8}"
+               title="Employee ID must contain exactly 8 digits"
+               placeholder="Enter 8-digit Employee ID"
+               required>
+
+        <label>Employee Name</label>
+
+        <input type="text"
+               name="emp_name"
+               required>
+
+        <label>Email</label>
+
+        <input type="email"
+               name="email"
+               required>
+
+        <label>Total Experience</label>
+
+        <input type="number"
+               name="experience"
+               required>
+
+        <label>Primary Skill</label>
+
+        <input type="text"
+               name="primary_skill"
+               required>
+
+        <label>Secondary Skill</label>
+
+        <input type="text"
+               name="secondary_skill"
+               required>
+
+        <label>CM Name</label>
+
+        <input type="text"
+               name="cm_name"
+               required>
+
+        <label>Profile Status</label>
+
+        <select name="profile_status" required>
+
+            <option value="Profile Shared">
+                Profile Shared
+            </option>
+
+            <option value="TP-1 Pending">
+                TP-1 Pending
+            </option>
+
+            <option value="TP-1 Selected">
+                TP-1 Selected
+            </option>
+
+            <option value="Rejected">
+                Rejected
+            </option>
+
+            <option value="TP-2 Selected">
+                TP-2 Selected
+            </option>
+
+            <option value="Customer Selected">
+                Customer Selected
+            </option>
+
+            <option value="Final Select Using Demand">
+                Final Select Using Demand
+            </option>
+
+            <option value="RAS In Progress">
+                RAS In Progress
+            </option>
+
+        </select>
+
+        <label>Customer</label>
+
+        <input type="text"
+               name="customer"
+               required>
+
+        <label>Date Shared</label>
+
+        <input type="date"
+               name="date_shared"
+               required>
+
+        <label>Project Owner</label>
+
+        <input type="text"
+               name="project_owner"
+               required>
+
+        <button type="submit" class="btn">
+            Save Employee
+        </button>
+
+    </form>
+
+</div>
+
+</body>
+</html>

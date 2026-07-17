@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Employee Resource Tracker</title>
+
+    <style>
+
+        body{
+            font-family: Arial, sans-serif;
+            background:#f4f6f9;
+            margin:0;
+        }
+
+        .header{
+            background:#0f4c81;
+            color:white;
+            padding:20px;
+            text-align:center;
+        }
+
+        .main-layout{
+            display:flex;
+        }
+
+        .sidebar{
+            width:250px;
+            background:#08345c;
+            min-height:100vh;
+            padding-top:20px;
+        }
+
+        .sidebar a{
+            display:block;
+            color:white;
+            text-decoration:none;
+            padding:15px 25px;
+            font-weight:bold;
+        }
+
+        .sidebar a:hover{
+            background:#0f4c81;
+        }
+
+        .container{
+            flex:1;
+            padding:30px;
+        }
+
+        .stats{
+            display:flex;
+            gap:20px;
+            flex-wrap:wrap;
+            margin-bottom:30px;
+        }
+
+        .stat-card{
+            flex:1;
+            min-width:220px;
+            background:white;
+            padding:25px;
+            border-radius:10px;
+            text-align:center;
+            box-shadow:0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .stat-card h2{
+            margin:0;
+            color:#0f4c81;
+            font-size:32px;
+        }
+
+        .stat-card p{
+            margin-top:10px;
+            font-size:16px;
+        }
+
+        .card{
+            background:white;
+            padding:30px;
+            margin:20px 0;
+            border-radius:10px;
+            box-shadow:0 2px 8px rgba(0,0,0,0.1);
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="header">
+    <h1>Employee Resource Tracker</h1>
+</div>
+
+<div class="main-layout">
+
+    <div class="sidebar">
+
+        <a href="/dashboard/">Dashboard</a>
+
+        <a href="/employee-list/">
+            Employees
+        </a>
+
+        {% if request.user.is_superuser %}
+
+    <a href="/add-employee/">
+        Add Employee
+    </a>
+
+    <a href="/employee-list/">
+        Modify Employee
+    </a>
+
+    <a href="/employee-list/">
+    Change Status
+</a>
+
+
+
+    <a href="/api/upload-excel/">
+        Upload Excel
+    </a>
+
+    <a href="/admin/">
+        Django Administration
+    </a>
+
+{% endif %}
+
+
+    </div>
+
+    <div class="container">
+
+        <div class="stats">
+
+            <div class="stat-card">
+                <h2>{{ total_employees }}</h2>
+                <p>Total Employees</p>
+            </div>
+
+            <div class="stat-card">
+                <h2>{{ customer_selected }}</h2>
+                <p>Customer Selected</p>
+            </div>
+
+            <div class="stat-card">
+                <h2>{{ tp1_pending }}</h2>
+                <p>TP-1 Status</p>
+            </div>
+
+            <div class="stat-card">
+                <h2>{{ rejected }}</h2>
+                <p>Rejected</p>
+            </div>
+
+        </div>
+
+        <div class="card">
+
+    <h2>Employee Records</h2>
+
+    <table style="width:100%; border-collapse:collapse; margin-top:20px;">
+
+        <thead>
+
+            <tr style="background:#0f4c81; color:white;">
+
+                <th style="padding:12px;">Emp ID</th>
+                <th style="padding:12px;">Name</th>
+                <th style="padding:12px;">Email</th>
+                <th style="padding:12px;">Experience</th>
+                <th style="padding:12px;">Status</th>
+                <th style="padding:12px;">Customer</th>
+                
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            {% for emp in employees %}
+
+            <tr>
+
+                <td style="padding:10px; border:1px solid #ddd;">
+                    {{ emp.emp_id }}
+                </td>
+
+                <td style="padding:10px; border:1px solid #ddd;">
+                    {{ emp.emp_name }}
+                </td>
+
+                <td style="padding:10px; border:1px solid #ddd;">
+                    {{ emp.email }}
+                </td>
+
+                <td style="padding:10px; border:1px solid #ddd;">
+                    {{ emp.experience }}
+                </td>
+
+                <td style="padding:10px; border:1px solid #ddd;">
+                    {{ emp.profile_status }}
+                </td>
+
+                <td style="padding:10px; border:1px solid #ddd;">
+                    {{ emp.customer }}
+                </td>
+
+             
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+    <div style="margin-top:20px; text-align:center;">
+
+        {% if employees.has_previous %}
+
+            <a href="?page=1"
+               style="margin-right:10px;">
+               First
+            </a>
+
+            <a href="?page={{ employees.previous_page_number }}"
+               style="margin-right:10px;">
+               Previous
+            </a>
+
+        {% endif %}
+
+        <span>
+
+            Page {{ employees.number }}
+            of
+            {{ employees.paginator.num_pages }}
+
+        </span>
+
+        {% if employees.has_next %}
+
+            <a href="?page={{ employees.next_page_number }}"
+               style="margin-left:10px;">
+               Next
+            </a>
+
+            <a href="?page={{ employees.paginator.num_pages }}"
+               style="margin-left:10px;">
+               Last
+            </a>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+        <div class="card">
+
+            <h2>Profile Status Summary</h2>
+
+            <table style="width:100%; border-collapse:collapse; margin-top:20px;">
+
+                <thead>
+
+                    <tr style="background:#0f4c81; color:white;">
+
+                        <th style="padding:12px;">Profile Status</th>
+                        <th style="padding:12px;">Count</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    <tr>
+                        <td style="padding:10px; border:1px solid #ddd;">Profile Shared</td>
+                        <td style="padding:10px; border:1px solid #ddd;">{{ profile_shared }}</td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding:10px; border:1px solid #ddd;">TP-1 Pending</td>
+                        <td style="padding:10px; border:1px solid #ddd;">{{ tp1_pending }}</td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding:10px; border:1px solid #ddd;">TP-1 Selected</td>
+                        <td style="padding:10px; border:1px solid #ddd;">{{ tp1_selected }}</td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding:10px; border:1px solid #ddd;">TP-2 Selected</td>
+                        <td style="padding:10px; border:1px solid #ddd;">{{ tp2_selected }}</td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding:10px; border:1px solid #ddd;">Customer Selected</td>
+                        <td style="padding:10px; border:1px solid #ddd;">{{ customer_selected }}</td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding:10px; border:1px solid #ddd;">Final Select Using Demand</td>
+                        <td style="padding:10px; border:1px solid #ddd;">{{ final_selected }}</td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding:10px; border:1px solid #ddd;">RAS In Progress</td>
+                        <td style="padding:10px; border:1px solid #ddd;">{{ ras_in_progress }}</td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding:10px; border:1px solid #ddd;">Rejected</td>
+                        <td style="padding:10px; border:1px solid #ddd;">{{ rejected }}</td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Employee List</title>
+
+    <style>
+
+        body{
+            font-family:Arial,sans-serif;
+            background:#f4f6f9;
+            margin:0;
+        }
+
+        .header{
+            background:#0f4c81;
+            color:white;
+            padding:20px;
+            text-align:center;
+        }
+
+        .container{
+            width:95%;
+            margin:auto;
+            margin-top:30px;
+        }
+
+        table{
+            width:100%;
+            border-collapse:collapse;
+            background:white;
+        }
+
+        th{
+            background:#0f4c81;
+            color:white;
+            padding:12px;
+        }
+
+        td{
+            padding:10px;
+            border:1px solid #ddd;
+        }
+
+        tr:hover{
+            background:#f2f2f2;
+        }
+
+        .back-btn{
+            display:inline-block;
+            margin-bottom:20px;
+            padding:10px 20px;
+            background:#0f4c81;
+            color:white;
+            text-decoration:none;
+            border-radius:5px;
+        }
+
+        .search-box{
+            width:300px;
+            padding:10px;
+            margin-bottom:20px;
+            border:1px solid #ccc;
+            border-radius:5px;
+            font-size:14px;
+        }
+
+        .employee-link{
+            color:#0f4c81;
+            cursor:pointer;
+            font-weight:bold;
+        }
+
+        .modal{
+            display:none;
+            position:fixed;
+            z-index:1000;
+            left:0;
+            top:0;
+            width:100%;
+            height:100%;
+            background:rgba(0,0,0,0.5);
+        }
+
+        .modal-content{
+            background:white;
+            width:500px;
+            margin:5% auto;
+            padding:25px;
+            border-radius:10px;
+        }
+
+        .close-btn{
+            float:right;
+            cursor:pointer;
+            font-size:22px;
+            font-weight:bold;
+        }
+
+        .detail-row{
+            margin:10px 0;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="header">
+    <h1>Employee Records</h1>
+</div>
+
+<div class="container">
+
+    <a href="/dashboard/" class="back-btn">
+    Dashboard
+</a>
+
+<a href="/add-employee/" class="back-btn" style="margin-left:10px;">
+    Add Employee
+</a>
+
+    <br><br>
+
+    <div style="margin-bottom:20px;">
+
+    <input
+        type="text"
+        id="searchInput"
+        class="search-box"
+        placeholder="Search Employee..."
+    >
+
+    <select
+        id="statusFilter"
+        class="search-box"
+        style="width:220px;"
+    >
+        <option value="">All Status</option>
+    </select>
+
+    <select
+        id="customerFilter"
+        class="search-box"
+        style="width:220px;"
+    >
+        <option value="">All Customers</option>
+    </select>
+
+</div>
+
+    <table>
+
+        <thead>
+            <tr>
+                <th>Emp ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Experience</th>
+                <th>Status</th>
+                <th>Customer</th>
+                {% if request.user.is_superuser %}
+{% endif %}
+
+            </tr>
+        </thead>
+
+        <tbody>
+
+        {% for emp in employees %}
+
+            <tr>
+
+                <td>{{ emp.emp_id }}</td>
+
+                <td>
+                    <span
+                        class="employee-link"
+                        onclick="openModal(
+                            '{{ emp.emp_id }}',
+                            '{{ emp.emp_name }}',
+                            '{{ emp.email }}',
+                            '{{ emp.experience }}',
+                            '{{ emp.primary_skill }}',
+                            '{{ emp.secondary_skill }}',
+                            '{{ emp.cm_name }}',
+                            '{{ emp.profile_status }}',
+                            '{{ emp.customer }}',
+                            '{{ emp.date_shared }}',
+                            '{{ emp.project_owner }}'
+                        )">
+                        {{ emp.emp_name }}
+                    </span>
+                </td>
+
+                <td>{{ emp.email }}</td>
+                <td>{{ emp.experience }}</td>
+                <td>{{ emp.profile_status }}</td>
+
+
+                <td>{{ emp.customer }}</td>
+                <td>
+
+{% if request.user.is_superuser %}
+
+    <a href="/edit-employee/{{ emp.id }}/"
+       class="back-btn"
+       style="padding:6px 12px;">
+
+        Edit
+
+    </a>
+
+{% endif %}
+
+</td>
+
+
+    
+
+
+            </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+    <div style="margin-top:20px; text-align:center;">
+
+    {% if employees.has_previous %}
+
+        <a href="?page=1" class="back-btn">
+            First
+        </a>
+
+        <a href="?page={{ employees.previous_page_number }}" class="back-btn">
+            Previous
+        </a>
+
+    {% endif %}
+
+    <span style="margin:0 15px; font-weight:bold;">
+        Page {{ employees.number }} of {{ employees.paginator.num_pages }}
+    </span>
+
+    {% if employees.has_next %}
+
+        <a href="?page={{ employees.next_page_number }}" class="back-btn">
+            Next
+        </a>
+
+        <a href="?page={{ employees.paginator.num_pages }}" class="back-btn">
+            Last
+        </a>
+
+    {% endif %}
+
+</div>
+
+</div>
+
+<div id="employeeModal" class="modal">
+
+    <div class="modal-content">
+
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+
+        <h2>Employee Details</h2>
+
+        <div class="detail-row"><b>Emp ID:</b> <span id="m_emp_id"></span></div>
+        <div class="detail-row"><b>Name:</b> <span id="m_name"></span></div>
+        <div class="detail-row"><b>Email:</b> <span id="m_email"></span></div>
+        <div class="detail-row"><b>Experience:</b> <span id="m_experience"></span></div>
+        <div class="detail-row"><b>Primary Skill:</b> <span id="m_primary"></span></div>
+        <div class="detail-row"><b>Secondary Skill:</b> <span id="m_secondary"></span></div>
+        <div class="detail-row"><b>CM Name:</b> <span id="m_cm"></span></div>
+        <div class="detail-row"><b>Profile Status:</b> <span id="m_status"></span></div>
+        <div class="detail-row"><b>Customer:</b> <span id="m_customer"></span></div>
+        <div class="detail-row"><b>Date Shared:</b> <span id="m_date"></span></div>
+        <div class="detail-row"><b>Project Owner:</b> <span id="m_owner"></span></div>
+
+    </div>
+
+</div>
+
+<script>
+
+const searchInput = document.getElementById("searchInput");
+const statusFilter = document.getElementById("statusFilter");
+const customerFilter = document.getElementById("customerFilter");
+
+const rows = document.querySelectorAll("tbody tr");
+
+let statuses = new Set();
+let customers = new Set();
+
+rows.forEach(row => {
+
+    statuses.add(row.cells[4].innerText.trim());
+    customers.add(row.cells[5].innerText.trim());
+
+});
+
+statuses.forEach(status => {
+
+    let option = document.createElement("option");
+    option.value = status;
+    option.text = status;
+
+    statusFilter.appendChild(option);
+
+});
+
+customers.forEach(customer => {
+
+    let option = document.createElement("option");
+    option.value = customer;
+    option.text = customer;
+
+    customerFilter.appendChild(option);
+
+});
+
+function filterTable() {
+
+    let searchValue =
+        searchInput.value.toLowerCase();
+
+    let statusValue =
+        statusFilter.value.toLowerCase();
+
+    let customerValue =
+        customerFilter.value.toLowerCase();
+
+    rows.forEach(row => {
+
+        let rowText =
+            row.innerText.toLowerCase();
+
+        let rowStatus =
+            row.cells[4].innerText.toLowerCase();
+
+        let rowCustomer =
+            row.cells[5].innerText.toLowerCase();
+
+        let matchesSearch =
+            rowText.includes(searchValue);
+
+        let matchesStatus =
+            !statusValue ||
+            rowStatus === statusValue;
+
+        let matchesCustomer =
+            !customerValue ||
+            rowCustomer === customerValue;
+
+        row.style.display =
+            matchesSearch &&
+            matchesStatus &&
+            matchesCustomer
+            ? ""
+            : "none";
+
+    });
+
+}
+
+searchInput.addEventListener(
+    "keyup",
+    filterTable
+);
+
+statusFilter.addEventListener(
+    "change",
+    filterTable
+);
+
+customerFilter.addEventListener(
+    "change",
+    filterTable
+);
+
+function openModal(
+    emp_id,
+    name,
+    email,
+    experience,
+    primary_skill,
+    secondary_skill,
+    cm_name,
+    status,
+    customer,
+    date_shared,
+    project_owner
+){
+
+    document.getElementById("m_emp_id").innerText = emp_id;
+    document.getElementById("m_name").innerText = name;
+    document.getElementById("m_email").innerText = email;
+    document.getElementById("m_experience").innerText = experience;
+    document.getElementById("m_primary").innerText = primary_skill;
+    document.getElementById("m_secondary").innerText = secondary_skill;
+    document.getElementById("m_cm").innerText = cm_name;
+    document.getElementById("m_status").innerText = status;
+    document.getElementById("m_customer").innerText = customer;
+    document.getElementById("m_date").innerText = date_shared;
+    document.getElementById("m_owner").innerText = project_owner;
+
+    document.getElementById("employeeModal").style.display = "block";
+}
+
+function closeModal(){
+    document.getElementById("employeeModal").style.display = "none";
+}
+
+</script>
+
+</body>
+</html>
